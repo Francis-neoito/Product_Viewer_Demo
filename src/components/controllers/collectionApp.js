@@ -1,0 +1,383 @@
+
+import products from '../../../static/js/productData';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RectAreaLightHelper }  from 'three/examples/jsm/helpers/RectAreaLightHelper.js';
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+// import {createApp} from "vue";
+let rootCollectionApp;
+
+const showProductEvent = new CustomEvent('showproductevent',{
+    detail:{
+        productid:null
+    }
+});
+
+const initCollectionApp = function(){
+    const app = Vue.createApp(
+        {
+            props:[],
+        },
+        {
+            products: [],
+        }
+    );
+    rootCollectionApp = app;
+
+    app.component('product',{
+        props: ['productData','tileh','tilew','rightmargin','isTile'],
+        data(){
+            return {};
+        },
+        created(){
+
+        },
+        mounted(){
+        },
+        methods:{
+            getImageSrc(){
+                return '/static/images/' + this.productData.imagename;
+            },
+            getColorText(){
+                const count = this.productData.color.split(',').length;
+                if(count == 1 ){
+                    return '1 Colour';
+                }else{
+                    return count + ' Colours';
+                }
+            },
+            showProduct(){
+                showProductEvent.detail.productid = this.productData.id;
+                document.dispatchEvent(showProductEvent)
+            }
+        },
+        template:`
+            <div class="productContanier" :style="{'height': tileh, 'width': tilew, 'margin-right':rightmargin}">
+                <div class="productImageContainer" @click="showProduct()">
+                    <img class="productImage" :src="getImageSrc()"/>
+                </div>
+                <div class="productInfoContainer">
+                    <div class="p-price">&#8377;{{productData.price}}</div>
+                    <div class="p-name" @click="showProduct()">{{productData.name}}</div>
+                    <div class="p-color" :style="{'display':isTile}">{{getColorText()}}</div> 
+                </div>
+            </div>
+        
+        `
+    });
+
+    app.component('productviewer',{
+        props:['productData'],
+        data(){
+            return{
+            }
+        },
+        created(){
+            document.addEventListener('stoprendering',(e)=>{
+                this.stopRendering();
+            });
+            // document.addEventListener('resetviewer',(e)=>{
+            //     this.stopRendering();
+            // });
+        },
+        mounted(){
+            this.dom = document.getElementById("viewerScene");
+            this.initScene();
+        },
+        methods:{
+            initScene(){
+                const canvaWidth = this.dom.getBoundingClientRect().width;
+                const canvaHeight = this.dom.getBoundingClientRect().height;
+                this.scene = new THREE.Scene();
+                RectAreaLightUniformsLib.init();
+                // this.camera = new THREE.OrthographicCamera(canvaWidth / - 35, canvaWidth / 35, canvaHeight / 35, canvaHeight / - 35, 0.1, 2000);
+                this.camera = new THREE.PerspectiveCamera(50, canvaWidth /  canvaHeight, 0.1, 2000);
+                this.renderer = new THREE.WebGLRenderer({antialias:true});
+                this.renderer.physicallyCorrectLights = true;
+                this.renderer.setSize( canvaWidth, canvaHeight );
+                this.renderer.domElement.style.height = `${canvaHeight} + 'px'`;
+                this.renderer.domElement.style.width = `${canvaWidth} + 'px'`; 
+                this.renderer.domElement.width = canvaWidth;
+                this.renderer.domElement.height = canvaHeight;
+                this.dom.appendChild( this.renderer.domElement );
+                this.renderer.setClearColor( 0x000000, 0 );
+
+                this.composer = new EffectComposer( this.renderer );
+                this.composer.setPixelRatio(window.devicePixelRatio);
+                // this.composer.setSize(canvaWidth, canvaHeight);
+                const renderPass = new RenderPass( this.scene, this.camera );
+                this.composer.addPass( renderPass );
+
+                this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+                this.ambLight = new THREE.AmbientLight( 0xffffff ); // soft white light
+                this.scene.add( this.ambLight );
+                // const axesHelper = new THREE.AxesHelper( 5 );
+                // this.scene.add( axesHelper );
+                // this.camera.position.set(0,0,100);
+                this.camera.position.set(0, 0, 50);
+                this.camera.zoom = 1.8;
+                this.camera.updateProjectionMatrix();
+                if(this.productData.objModelName!=null){
+                    this.loadProductGltfModel();
+                    // this.loadProductObjModel();
+                }
+                const p1 = new THREE.RectAreaLight( 0xffffff, 1,  20,20 );
+                p1.position.set( -10, 10, -20 );
+                p1.lookAt(0,0,0);
+                const p2 = new THREE.RectAreaLight( 0xffffff, 15,  20,20 );
+                p2.power = 1000;
+                p2.position.set( 0, 0, 20 );
+                p2.lookAt(0,0,0);
+                this.scene.add(p1);
+                this.scene.add(p2)
+                const rectLightHelper = new RectAreaLightHelper( p2 );
+                // p2.add( rectLightHelper );
+                // p1.add( new RectAreaLightHelper( p1 ) );
+                this.startRendering();
+            },
+            loadComplete(gltf){
+                this.scene.add( gltf.scene );
+                gltf.scene.position.y = -5;
+                gltf.scene.scale.set(5,5,5);
+                gltf.scene.rotation.set(0,290*Math.PI/180,0);
+
+
+            },
+            objLoadComplete(object){
+                this.scene.add( object );
+                object.position.y = -50;
+                object.scale.set(0.1,0.1,0.1);
+            },
+            loadProductObjModel(){
+                const loader = new OBJLoader();
+                loader.load(
+                    // resource URL
+                    '/static/objects/' + this.productData.objModelName,
+                    // called when resource is loaded
+                    this.objLoadComplete,
+                    // called when loading is in progresses
+                    function ( xhr ) {
+                    
+                        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+                
+                    },
+                    // called when loading has errors
+                    function ( error ) {
+                
+                        console.log( 'An error happened' );
+                
+                    }
+                );
+            },
+            loadProductGltfModel(){
+                const loader = new GLTFLoader();
+                loader.load(
+                    // resource URL
+                    '/static/objects/' + this.productData.objModelName,
+                    // called when the resource is loaded
+                    this.loadComplete,
+                    // called while loading is progressing
+                    function ( xhr ) {
+
+                        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+                    },
+                    // called when loading has errors
+                    function ( error ) {
+
+                        console.log( 'An error happened' );
+
+                    }
+                );
+            },
+            animate(){
+                this.renderer.render( this.scene, this.camera );
+            },
+            startRendering(){
+                this.renderer.setAnimationLoop(this.animate);
+            },
+            stopRendering(){
+                this.renderer.setAnimationLoop(null);
+            }
+        },
+        template:`
+            <div id="viewerScene"></div>
+        `
+    });
+
+    app.component('collections',{
+        props: [],
+        data(){
+            return {
+                rootCmp: rootCollectionApp,
+                colSize:4,
+                showProductMode: false,
+                activeProductId:null,
+                activeProduct: null,
+            };
+        },
+        created(){
+            rootCollectionApp._props.products = products;
+            document.addEventListener('showproductevent',(e)=>{
+                if(e.detail.productid!=null){
+                    this.activeProductId = e.detail.productid;
+                    const pr = rootCollectionApp._props.products.filter((p)=> p.id === this.activeProductId);
+                    if(pr.length ==1){
+                        this.activeProduct = pr[0];
+                        this.showProductMode = true;
+                        document.body.scrollTop = 0; // For Safari
+                        document.documentElement.scrollTop = 0; 
+                        document.dispatchEvent(new Event('resetviewer'));
+                    }
+                }
+            });
+        },
+        mounted(){
+        },
+        methods:{
+            getRowNum(){
+                return Math.ceil(this.rootCmp._props.products.length/this.colSize);
+            },
+            getIndex(row,col){
+                return (row-1)*this.colSize + (col);
+            },
+            isCellAvailable(row,col){
+                if(this.getIndex(row,col) > this.rootCmp._props.products.length)
+                    return false;
+                return true;
+            },
+            closeViewer(){
+                document.dispatchEvent(new Event('stoprendering'));
+                this.activeProduct = null;
+                this.activeProductId = null;
+                this.showProductMode = false;
+                document.body.scrollTop = 0; // For Safari
+                document.documentElement.scrollTop = 0; 
+            },
+            getSizeOptions(){
+                return this.activeProduct.size.split(',');
+            },
+            getSuggestedProduct(){
+                return rootCollectionApp._props.products.slice(0, 4);
+            }
+
+        },
+        template: `
+            <div id="collectionHeader">
+                <nav id="navleft" class="nav js-nav">
+                    <ul class="slider-ul">
+                    <li class="slider-li">
+                    <a class="sliderA" href="/index.html"><span class="navSpan">Home</span></a>
+                    </li>
+                    <li class="slider-li">
+                        <a class="sliderA is-active" href="/collections.html"><span class="navSpan">Collections</span></a>
+                    </li>
+                    <li class="slider-li">
+                            <a class="sliderA" href="#"><span class="navSpan">Contact Us</span></a>
+                    </li>
+                    </ul>
+                </nav>
+                <figure class="logo">
+                    <img src="/static/images/Diesel_logo.svg">
+                </figure>
+                <nav id="navright" class="nav">
+                    <ul class="slider-ul">
+                        <li class="slider-li">
+                        <a class="sliderA" href="#">
+                            <span>Account</span>
+                        </a>
+                        </li>
+                        <li class="slider-li">
+                        <a class="sliderA" href="#">
+                            <span>Cart</span>
+                            <div class="cart-total">0</div>
+                        </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div id="productViewerContainer" v-if="showProductMode">
+                <div id="closeViewer" @click="closeViewer()">X</div>
+                <div id="productArea">
+                    <div id="productViewerBlock">
+                        <productviewer :productData=activeProduct></productviewer>
+                    </div>
+                    <div id="productOptionsContainer">
+                        <h1 class="productTitle">{{activeProduct.name}}</h1>
+                        <p class="info-price">MRP {{activeProduct.price}}</p>
+                        <p class="info-tax">Price inclusive of all taxes</p>
+                        <p class="info-price" style="font-size:.875rem">COLOR: <span style="color:#5f5f5f;font-weight:100">{{activeProduct.color}}</span></p>
+                        <p class="info-price">CHOOSE SIZE</p>
+                        <div class="sizeOptionsBlock">
+                            <div class="sizeOptions" v-for="size in getSizeOptions()">
+                                {{size}}
+                            </div>
+                        </div>
+                        <div class="cartoptions">
+                            <div class="addToCart">ADD TO CART</div>
+                            <div class="wishlist"><img style="height:100%;width:100%" src="/static/images/wishlistheart.svg"/></div>
+                        </div>
+                        <p class="info-price">DESCRIPTION</p>
+                        <div class="detailsText">
+                            <ul>
+                                <li>{{activeProduct.description}}</li>
+                            </ul>
+                        </div>
+                        <p class="info-price">PRODUCT DETAILS</p>
+                        <div class="detailsText">
+                            <ul>
+                                <li class="detailList" v-for="detail in activeProduct.details.split(',')" >{{detail}}</li>
+                            </ul>
+                        </div>
+                        <p class="info-price">OTHER DETAILS</p>
+                        <div class="detailsText">
+                            <ul>
+                                <li class="detailList" v-for="detail in activeProduct.otherdetails.split(',')" >{{detail}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="suggestionArea">
+                    <h1>YOU MAY ALSO LIKE</h1>
+                    <div class="productSuggestionBlock">
+                        <product v-for="product in getSuggestedProduct()" :productData=product :tileh="'30vh'" :tilew="'20vw'" :rightmargin="'15px'" :isTile="'none'"></product>
+                    </div>
+                </div>
+            </div>
+            <div v-else id="collectionBody">
+                <div id="filterContainer">
+                    <table id="filterTable">
+                        <tr>
+                            <td ><span id="filterLabel">Filter By</span></td>
+                            <td ><div class="filterColumn">Category <div class="downarrow"></div></div></td>
+                            <td ><div class="filterColumn">Size <div class="downarrow"></div></div></td>
+                            <td ><div class="filterColumn">Color <div class="downarrow"></div></div></td>
+                            <td ><div class="filterColumn">Fabric <div class="downarrow"></div></div></td>
+                            <td ><div class="filterColumn">Product Type <div class="downarrow"></div></div></td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="collectionResultContainer">
+                    <table id="collectionTable">
+                        <tr v-for="row in Number(getRowNum())">
+                            <td class="productGrid" v-for="col in Number(colSize)">
+                                <product v-if="isCellAvailable(row,col)" :productData="rootCmp._props.products[getIndex(row,col)-1]"></product>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="collectionFooter">
+                <div id="footerHead">Diesel private limited</div>
+            </div>
+
+        `,
+    });
+    return app;
+}
+
+export {initCollectionApp, rootCollectionApp};

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diesel | Collections</title>
+  </head>
+  <body>
+    <div id="collectionAppContainer">
+      <collections></collections>
+    </div>
+  </body>
+  <script>
+    (function (d, s, id) {
+      var js,
+        node = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {
+        return;
+      }
+      js = d.createElement(s);
+      js.id = id;
+      js.onload = function () {};
+      js.src = '../static/js/vue.global.js';
+      node.parentNode.insertBefore(js, node);
+    })(document, 'script', 'vue-js');
+    (function (d, s, id) {
+      var js,
+        node = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {
+        return;
+      }
+      js = d.createElement(s);
+      js.id = id;
+      js.onload = function () {};
+      js.src = '../static/js/TweenMax.js';
+      node.parentNode.insertBefore(js, node);
+    })(document, 'script', 'tweenmax-js');
+    (function (d, s, id) {
+      var js,
+        node = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {
+        return;
+      }
+      js = d.createElement(s);
+      js.id = id;
+      js.type = 'module';
+      js.onload = function () {};
+      js.src = '/src/main.js';
+      node.parentNode.insertBefore(js, node);
+    })(document, 'script', 'main-js');
+  </script>
+  <!-- <script type="module" src="/src/main.js"></script> -->
+</html>
