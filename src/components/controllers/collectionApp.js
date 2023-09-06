@@ -10,10 +10,9 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-
-// import {createApp} from "vue";
+import {createApp} from "vue/dist/vue.esm-bundler.js";
 let rootCollectionApp;
-let generatedCubeRenderTarget, ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
+
 const showProductEvent = new CustomEvent('showproductevent',{
     detail:{
         productid:null
@@ -21,7 +20,7 @@ const showProductEvent = new CustomEvent('showproductevent',{
 });
 
 const initCollectionApp = function(){
-    const app = Vue.createApp(
+    const app = createApp(
         {
             props:[],
         },
@@ -154,9 +153,9 @@ const initCollectionApp = function(){
                 gltf.scene.position.y = 0;
                 gltf.scene.scale.set(7,7,7);
                 gltf.scene.rotation.set(-20*Math.PI/180,-10*Math.PI/180,0);
-                console.log(this.meshes);
-                this.meshes[6].material.color = new THREE.Color(0.1,0.2,0.8);
-                this.meshes[7].material.color = new THREE.Color(0.8,0.7,0.1);
+                // console.log(this.meshes);
+                // this.meshes[6].material.color = new THREE.Color(0.1,0.2,0.8);
+                // this.meshes[7].material.color = new THREE.Color(0.8,0.7,0.1);
             },
             objLoadComplete(object){
                 this.scene.add( object );
