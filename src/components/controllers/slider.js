@@ -69,9 +69,9 @@ class Slider {
     //     'https://s3-us-west-2.amazonaws.com/s.cdpn.io/58281/bg3.jpg'
     //   ]
     this.images = [
-        '/static/images/bg1.jpg',
-        '/static/images/bg2.jpg',
-        '/static/images/bg3.jpeg'
+        './images/bg1.jpg',
+        './images/bg2.jpg',
+        './images/bg3.jpeg'
       ]
       this.data = {
         current: 0,

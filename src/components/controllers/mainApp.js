@@ -42,7 +42,7 @@ const initMainApp = function(){
                 </ul>
             </nav>
             <figure class="logo">
-                <img src="/static/images/Diesel_logo.svg">
+                <img src="./images/Diesel_logo.svg">
             </figure>
             <nav id="navright" class="nav">
                 <ul class="slider-ul">
@@ -65,10 +65,10 @@ const initMainApp = function(){
                 <div class="slide js-slide">
                     <div class="slide__content">
                     <figure class="slide__img js-slide__img">
-                        <img src="/static/images/p1.jpg">
+                        <img src="./images/p1.jpg">
                     </figure>
                     <figure class="slide__img js-slide__img">
-                        <img src="/static/images/p2.jpg">
+                        <img src="./images/p2.jpg">
                     </figure>
                 </div>
     
@@ -84,10 +84,10 @@ const initMainApp = function(){
   <div class="slide js-slide">
     <div class="slide__content">
       <figure class="slide__img js-slide__img">
-        <img src="/static/images/p3.jpg">
+        <img src="./images/p3.jpg">
       </figure>
        <figure class="slide__img js-slide__img">
-        <img src="/static/images/p4.jpg">
+        <img src="./images/p4.jpg">
       </figure>
     </div>
     <div class="slider__text js-slider__text">
@@ -100,10 +100,10 @@ const initMainApp = function(){
   <div class="slide js-slide">
     <div class="slide__content">
       <figure class="slide__img js-slide__img">
-        <img src="/static/images/p7.png">
+        <img src="./images/p7.png">
       </figure>
        <figure class="slide__img js-slide__img">
-        <img src="/static/images/p5.jpg">
+        <img src="./images/p5.jpg">
       </figure>
     </div>
     <div class="slider__text js-slider__text">

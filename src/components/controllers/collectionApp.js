@@ -1,5 +1,5 @@
 
-import products from '../../../static/js/productData';
+import products from './productData';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
@@ -42,7 +42,7 @@ const initCollectionApp = function(){
         },
         methods:{
             getImageSrc(){
-                return '/static/images/' + this.productData.imagename;
+                return './images/' + this.productData.imagename;
             },
             getColorText(){
                 const count = this.productData.color.split(',').length;
@@ -133,7 +133,7 @@ const initCollectionApp = function(){
 					pmremGenerator.dispose();
 				};
                 const hdrCubeMap = new RGBELoader()
-					.setPath( '/static/images/' )
+					.setPath( './images/' )
 					.load( 'aircraft_workshop_01_1k.hdr', this.envLoadComplete);
 
                 this.controls.autoRotate = true;
@@ -166,7 +166,7 @@ const initCollectionApp = function(){
                 const loader = new OBJLoader();
                 loader.load(
                     // resource URL
-                    '/static/objects/' + this.productData.objModelName,
+                    './objects/' + this.productData.objModelName,
                     // called when resource is loaded
                     this.objLoadComplete,
                     // called when loading is in progresses
@@ -191,7 +191,7 @@ const initCollectionApp = function(){
                 loader.setDRACOLoader( dracoLoader );
                 loader.load(
                     // resource URL
-                    '/static/objects/' + this.productData.objModelName,
+                    './objects/' + this.productData.objModelName,
                     // called when the resource is loaded
                     this.loadComplete,
                     // called while loading is progressing
@@ -297,7 +297,7 @@ const initCollectionApp = function(){
                     </ul>
                 </nav>
                 <figure class="logo">
-                    <img src="/static/images/Diesel_logo.svg">
+                    <img src="./images/Diesel_logo.svg">
                 </figure>
                 <nav id="navright" class="nav">
                     <ul class="slider-ul">
@@ -334,7 +334,7 @@ const initCollectionApp = function(){
                         </div>
                         <div class="cartoptions">
                             <div class="addToCart">ADD TO CART</div>
-                            <div class="wishlist"><img style="height:100%;width:100%" src="/static/images/wishlistheart.svg"/></div>
+                            <div class="wishlist"><img style="height:100%;width:100%" src="./images/wishlistheart.svg"/></div>
                         </div>
                         <p class="info-price">DESCRIPTION</p>
                         <div class="detailsText">
