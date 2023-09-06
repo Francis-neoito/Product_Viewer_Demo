@@ -1,9 +1,9 @@
 import { Slider } from "./slider";
-// import {createApp} from "vue";
+import {createApp} from "vue";
 let rootApp;
 
 const initMainApp = function(){
-    const app = Vue.createApp(
+    const app = createApp(
         {
             props:[],
         },
