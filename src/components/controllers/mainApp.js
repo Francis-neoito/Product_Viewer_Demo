@@ -31,10 +31,10 @@ const initMainApp = function(){
             <nav id="navleft" class="nav js-nav">
                 <ul class="slider-ul">
                 <li class="slider-li">
-                <a class="sliderA is-active" href="/index.html"><span class="navSpan">Home</span></a>
+                <a class="sliderA is-active" href="/Product_Viewer_Demo/index.html"><span class="navSpan">Home</span></a>
                 </li>
                 <li class="slider-li">
-                    <a class="sliderA" href="/collections.html"><span class="navSpan">Collections</span></a>
+                    <a class="sliderA" href="/Product_Viewer_Demo/collections.html"><span class="navSpan">Collections</span></a>
                 </li>
                 <li class="slider-li">
                         <a class="sliderA" href="#"><span class="navSpan">Contact Us</span></a>
