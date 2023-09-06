@@ -8,9 +8,12 @@ import { RectAreaLightHelper }  from 'three/examples/jsm/helpers/RectAreaLightHe
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader';
+import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+
 // import {createApp} from "vue";
 let rootCollectionApp;
-
+let generatedCubeRenderTarget, ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
 const showProductEvent = new CustomEvent('showproductevent',{
     detail:{
         productid:null
@@ -125,27 +128,35 @@ const initCollectionApp = function(){
                     this.loadProductGltfModel();
                     // this.loadProductObjModel();
                 }
-                const p1 = new THREE.RectAreaLight( 0xffffff, 1,  20,20 );
-                p1.position.set( -10, 10, -20 );
-                p1.lookAt(0,0,0);
-                const p2 = new THREE.RectAreaLight( 0xffffff, 15,  20,20 );
-                p2.power = 1000;
-                p2.position.set( 0, 0, 20 );
-                p2.lookAt(0,0,0);
-                this.scene.add(p1);
-                this.scene.add(p2)
-                const rectLightHelper = new RectAreaLightHelper( p2 );
-                // p2.add( rectLightHelper );
-                // p1.add( new RectAreaLightHelper( p1 ) );
+                const pmremGenerator = new THREE.PMREMGenerator( this.renderer );
+                pmremGenerator.compileCubemapShader();
+                THREE.DefaultLoadingManager.onLoad = function ( ) {
+					pmremGenerator.dispose();
+				};
+                const hdrCubeMap = new RGBELoader()
+					.setPath( '/static/images/' )
+					.load( 'aircraft_workshop_01_1k.hdr', this.envLoadComplete);
+
+                this.controls.autoRotate = true;
+                this.controls.autoRotateSpeed = 1.5;
+                this.controls.minDistance = 30;
+                this.controls.maxDistance  = 100;
+                this.controls.enablePan = false;
                 this.startRendering();
             },
+            envLoadComplete(texture){
+                texture.mapping = THREE.EquirectangularReflectionMapping;
+                this.scene.environment = texture;
+            },
             loadComplete(gltf){
+                this.meshes= gltf.scene.children[0].children[0].children[0].children;
                 this.scene.add( gltf.scene );
-                gltf.scene.position.y = -5;
-                gltf.scene.scale.set(5,5,5);
-                gltf.scene.rotation.set(0,290*Math.PI/180,0);
-
-
+                gltf.scene.position.y = 0;
+                gltf.scene.scale.set(7,7,7);
+                gltf.scene.rotation.set(-20*Math.PI/180,-10*Math.PI/180,0);
+                console.log(this.meshes);
+                this.meshes[6].material.color = new THREE.Color(0.1,0.2,0.8);
+                this.meshes[7].material.color = new THREE.Color(0.8,0.7,0.1);
             },
             objLoadComplete(object){
                 this.scene.add( object );
@@ -175,6 +186,10 @@ const initCollectionApp = function(){
             },
             loadProductGltfModel(){
                 const loader = new GLTFLoader();
+                const dracoLoader = new DRACOLoader();
+                dracoLoader.setDecoderConfig({ type: 'js' });
+                dracoLoader.setDecoderPath( 'https://www.gstatic.com/draco/v1/decoders/' );
+                loader.setDRACOLoader( dracoLoader );
                 loader.load(
                     // resource URL
                     '/static/objects/' + this.productData.objModelName,
@@ -196,6 +211,7 @@ const initCollectionApp = function(){
             },
             animate(){
                 this.renderer.render( this.scene, this.camera );
+                this.controls.update();
             },
             startRendering(){
                 this.renderer.setAnimationLoop(this.animate);

@@ -10,7 +10,7 @@ const products = [
         producttype: 'pants',
         price: 5999,
         imagename: 'pr1.jpg',
-        objModelName: 'GiftBox_gltf.gltf',
+        objModelName: 'ring_webgi.glb',
         description: 'Slim style with a clean construction and essential details. This versatile jean features a comfortable silhouette, finished with a zip fly. The fabric is made using 22% certified recycled cotton, reducing the use of virgin resources. Crafted from denim with partially recycled fibres and a hint of stretch. It features a medium blue wash with a classic, subtly lived-in look.',
         details: 'Material:99%Cotton 1%Elastane-Spandex, Color:Blue,Occasion:Casual Wear,Fit: Slim,Waist: Mid Rise,Closure: Zip Fly',
         otherdetails:'Customer Support Details: Support Number: 022- 48930102, Support Email: support@dieselindia.com,Marketed And Imported By: Diesel Fashion India Reliance Pvt. Ltd., 8th Floor, Maker Tower E, Cuffe Parade, Mumbai, Maharashtra, 400005.,Net Quantity: 1 N,Country Of Origin: Mauritius,Name Of Commodity: Jeans,Style Code: A03558 0NFAJ',
