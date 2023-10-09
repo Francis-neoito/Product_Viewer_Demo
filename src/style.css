@@ -278,6 +278,23 @@ z-index: 10;
   height: 90vh;
   width: 100%;
 }
+#sceneLoader{
+  position: absolute;
+  height: 90vh;
+  width: 100%;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+}
+#sceneLoaderBar{
+  position: absolute;
+  top: 50%;
+  height: 0.5em;
+  width: 0%;
+  background-color: #000;
+  border-radius: 0.25rem;
+  transition: 0.5s;
+}
 #productOptionsContainer{
   width: calc(100% - 55vw);
   padding-top: 2em;
@@ -497,7 +514,7 @@ z-index: 10;
   position: relative;
   height: 100%;
   width: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .productInfoContainer{
